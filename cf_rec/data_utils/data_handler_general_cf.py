@@ -11,6 +11,8 @@ class DataHandlerGeneralCF:
 	def __init__(self):
 		if configs['data']['name'] == 'steam':
 			predir = '../data/steam/'
+		elif configs['data']['name'] == 'katchers':
+			predir = '../data/katchers/'
 		else:
 			raise NotImplementedError
 		self.trn_file = predir + 'trn_mat.pkl'

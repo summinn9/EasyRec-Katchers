@@ -9,7 +9,7 @@ import torch.nn as nn
 def parse_configure(model=None, dataset=None):
     parser = argparse.ArgumentParser(description='SSLRec')
     parser.add_argument('--model', type=str, default='LightGCN_plus', help='Model name')
-    parser.add_argument('--dataset', type=str, default='steam', help='Dataset name')
+    parser.add_argument('--dataset', type=str, default='katchers', help='Dataset name')
     parser.add_argument('--device', type=str, default='cuda', help='cpu or cuda')
     parser.add_argument('--seed', type=int, default=None, help='Device number')
     parser.add_argument('--cuda', type=str, default='0', help='Device number')

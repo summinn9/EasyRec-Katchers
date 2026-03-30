@@ -33,8 +33,8 @@ class GCCF_plus(BaseModel):
 		self.gcnLayers = nn.Sequential(*[GCNLayer(self.embedding_size) for i in range(self.layer_num)])
 		self.is_training = True
 
-		self.usrprf_embeds = t.tensor(configs['usrprf_embeds']).float().cuda()
-		self.itmprf_embeds = t.tensor(configs['itmprf_embeds']).float().cuda()
+		self.usrprf_embeds = t.tensor(configs['usrprf_embeds']).float().to(configs['device'])
+		self.itmprf_embeds = t.tensor(configs['itmprf_embeds']).float().to(configs['device'])
 		output_size = int((self.layer_num + 1) * self.embedding_size)
 		self.mlp = nn.Sequential(
 			nn.Linear(self.usrprf_embeds.shape[1], (self.usrprf_embeds.shape[1] + output_size) // 2),
