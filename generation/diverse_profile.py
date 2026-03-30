@@ -2,77 +2,58 @@ import os
 import json
 import time
 import openai
-import numpy as np
 
-openai.api_key = ""
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+DATASET = "katchers"
+BASE_DIR = f"./data/{DATASET}"
+SAVE_DIR = os.path.join(BASE_DIR, "diverse_profile")
+os.makedirs(SAVE_DIR, exist_ok=True)
 
 def get_gpt_response_w_system(instruction, prompt):
     completion = openai.ChatCompletion.create(
-        model='gpt-3.5-turbo-0125', # You can also utilize gpt-4o-mini, which is more cost-effective.
+        model="gpt-3.5-turbo-0125",
         messages=[
             {"role": "system", "content": instruction},
             {"role": "user", "content": prompt},
         ]
     )
-    response = completion.choices[0].message.content
-    # print(response)
-    return response
+    return completion.choices[0].message.content.strip()
 
-# Here is an example code to diversify the user/item profiles
+# 원본 profile 읽기: 현재 네 파일 형식은 json.load() 방식
+with open(os.path.join(BASE_DIR, "user_profile.json"), "r", encoding="utf-8") as f:
+    user_profile = json.load(f)
 
-item_profile = {}
-with open('../data/arts/item_profile.json', 'r') as f:
-    for _line in f.readlines():
-        _data = json.loads(_line)
-        item_profile[_data["item_id"]] = _data["profile"]
+with open(os.path.join(BASE_DIR, "item_profile.json"), "r", encoding="utf-8") as f:
+    item_profile = json.load(f)
 
-user_profile = {}
-with open('../data/arts/user_profile.json', 'r') as f:
-    for _line in f.readlines():
-        _data = json.loads(_line)
-        user_profile[_data["user_id"]] = _data["profile"]
+# system prompt 읽기
+with open("./generation/instruction/user_system_prompt_diverse.txt", "r", encoding="utf-8") as f:
+    user_system_prompt = f.read()
 
-item_system_prompt = ""
-with open('instruction/item_system_prompt_diverse.txt', 'r') as f:
-    for line in f.readlines():
-        item_system_prompt += line
+with open("./generation/instruction/item_system_prompt_diverse.txt", "r", encoding="utf-8") as f:
+    item_system_prompt = f.read()
 
-user_system_prompt = ""
-with open('instruction/user_system_prompt_diverse.txt', 'r') as f:
-    for line in f.readlines():
-        user_system_prompt += line
+DIVERSE_NUM = 3
 
-pick_item_id = np.random.choice(len(item_profile))
-pick_user_id = np.random.choice(len(user_profile))
+for diverse_no in range(DIVERSE_NUM):
+    user_save_path = os.path.join(SAVE_DIR, f"diverse_user_profile_{diverse_no}.json")
+    item_save_path = os.path.join(SAVE_DIR, f"diverse_item_profile_{diverse_no}.json")
 
-class Colors:
-    GREEN = '\033[92m'
-    END = '\033[0m'
+    with open(user_save_path, "w", encoding="utf-8") as uf:
+        for user_id_str, profile in user_profile.items():
+            user_id = int(user_id_str)
+            response = get_gpt_response_w_system(user_system_prompt, profile)
+            record = {"user_id": user_id, "profile": response}
+            uf.write(json.dumps(record, ensure_ascii=False) + "\n")
+            time.sleep(0.5)
 
-print(Colors.GREEN + f"Diversify Profile for Item {pick_item_id}" + Colors.END)
-print("---------------------------------------------------\n")
-print(Colors.GREEN + "The System Prompt (Instruction) is:\n" + Colors.END)
-print(item_system_prompt)
-print("---------------------------------------------------\n")
-print(Colors.GREEN + "The Input Prompt is:\n" + Colors.END)
-print(item_profile[pick_item_id])
-print("---------------------------------------------------\n")
-response = get_gpt_response_w_system(item_system_prompt, item_profile[pick_item_id])
-print(Colors.GREEN + "Generated Results:\n" + Colors.END)
-print(response)
+    with open(item_save_path, "w", encoding="utf-8") as itf:
+        for item_id_str, profile in item_profile.items():
+            item_id = int(item_id_str)
+            response = get_gpt_response_w_system(item_system_prompt, profile)
+            record = {"item_id": item_id, "profile": response}
+            itf.write(json.dumps(record, ensure_ascii=False) + "\n")
+            time.sleep(0.5)
 
-print('=' * 20)
-time.sleep(1)
-
-
-print(Colors.GREEN + f"Diversify Profile for User {pick_user_id}" + Colors.END)
-print("---------------------------------------------------\n")
-print(Colors.GREEN + "The System Prompt (Instruction) is:\n" + Colors.END)
-print(user_system_prompt)
-print("---------------------------------------------------\n")
-print(Colors.GREEN + "The Input Prompt is:\n" + Colors.END)
-print(user_profile[pick_user_id])
-print("---------------------------------------------------\n")
-response = get_gpt_response_w_system(user_system_prompt, user_profile[pick_user_id])
-print(Colors.GREEN + "Generated Results:\n" + Colors.END)
-print(response)
+print("Diverse profiles saved successfully.")

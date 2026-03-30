@@ -44,7 +44,8 @@ if version.parse(torch.__version__) >= version.parse("1.6"):
 if is_datasets_available():
     import datasets
 
-from transformers.optimization import Adafactor, AdamW, get_scheduler
+from transformers.optimization import Adafactor, get_scheduler
+from torch.optim import AdamW
 import copy
 
 import numpy as np

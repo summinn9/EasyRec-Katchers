@@ -33,8 +33,8 @@ class LightGCN_plus(BaseModel):
 		# 	self.usrprf_embeds = t.tensor(pickle.load(f)).float().cuda()
 		# with open(self.itmprf_embeds_path, 'rb') as f:
 		# 	self.itmprf_embeds = t.tensor(pickle.load(f)).float().cuda()
-		self.usrprf_embeds = t.tensor(configs['usrprf_embeds']).float().cuda()
-		self.itmprf_embeds = t.tensor(configs['itmprf_embeds']).float().cuda()
+		self.usrprf_embeds = t.tensor(configs['usrprf_embeds']).float().to(configs['device'])
+		self.itmprf_embeds = t.tensor(configs['itmprf_embeds']).float().to(configs['device'])
 		self.mlp = nn.Sequential(
 			nn.Linear(self.usrprf_embeds.shape[1], (self.usrprf_embeds.shape[1] + self.embedding_size) // 2),
 			nn.LeakyReLU(),
