@@ -34,7 +34,7 @@ config = AutoConfig.from_pretrained(model_name_or_path)
 model = Easyrec.from_pretrained(
     model_name_or_path,
     from_tf=bool(".ckpt" in model_name_or_path),
-    config=config,             
+    config=config,
 ).to(device)
 tokenizer = transformers.AutoTokenizer.from_pretrained(
     model_name_or_path,
@@ -45,9 +45,9 @@ eval_datas = [args.dataset]
 diverse_profile_num = 1
 
 for _dataset in eval_datas:
-    save_path = f'./data/{_dataset}/text_emb'
+    save_path = f'/content/drive/MyDrive/EasyRec-Katchers/text_emb/{_dataset}'
     os.makedirs(save_path, exist_ok=True)
-    
+
     # original profiles
     user_profile, item_profile = {}, {}
     user_profile_list, item_profile_list = [], []
@@ -56,12 +56,12 @@ for _dataset in eval_datas:
 
     with open(f'./data/{_dataset}/item_profile.json', 'r') as f:
         item_profile = json.load(f)
-    
+
     for i in range(len(user_profile)):
         user_profile_list.append(user_profile[str(i)])
     for i in range(len(item_profile)):
         item_profile_list.append(item_profile[str(i)])
-    
+
     profiles = user_profile_list + item_profile_list
     batch_size = 128
     n_batchs = math.ceil(len(profiles) / batch_size)
@@ -72,21 +72,21 @@ for _dataset in eval_datas:
         batch_profile = profiles[start: end]
         inputs = tokenizer(batch_profile, padding=True, truncation=True, max_length=512, return_tensors="pt")
         for tem in inputs:
-            inputs[tem] = inputs[tem]
+            inputs[tem] = inputs[tem].to(device)
         with torch.inference_mode():
             embeddings = model.encode(input_ids=inputs.input_ids, attention_mask=inputs.attention_mask)
         embeddings = F.normalize(embeddings.pooler_output.detach().float(), dim=-1)
         text_emb.append(embeddings.cpu())
     text_emb = torch.concat(text_emb, dim=0)
     user_emb = text_emb[: len(user_profile)].numpy()
-    item_emb = text_emb[len(user_profile): ].numpy()
-    
+    item_emb = text_emb[len(user_profile):].numpy()
+
     if save:
         with open(f'{save_path}/user_{model_name_or_path.split("/")[-1]}.pkl', 'wb') as f:
             pickle.dump(user_emb, f)
         with open(f'{save_path}/item_{model_name_or_path.split("/")[-1]}.pkl', 'wb') as f:
             pickle.dump(item_emb, f)
-    
+
     # diversified profiles
     os.makedirs(f'{save_path}/diverse_profile', exist_ok=True)
     for diverse_no in range(diverse_profile_num):
@@ -123,10 +123,12 @@ for _dataset in eval_datas:
             text_emb.append(embeddings.cpu())
         text_emb = torch.concat(text_emb, dim=0)
         user_emb = text_emb[: len(user_profile)].numpy()
-        item_emb = text_emb[len(user_profile): ].numpy()
+        item_emb = text_emb[len(user_profile):].numpy()
 
         if save:
-            with open(f'{save_path}/diverse_profile/user_{model_name_or_path.split("/")[-1]}_{diverse_no}.pkl', 'wb') as f:
+            with open(f'{save_path}/diverse_profile/user_{model_name_or_path.split("/")[-1]}_{diverse_no}.pkl',
+                      'wb') as f:
                 pickle.dump(user_emb, f)
-            with open(f'{save_path}/diverse_profile/item_{model_name_or_path.split("/")[-1]}_{diverse_no}.pkl', 'wb') as f:
+            with open(f'{save_path}/diverse_profile/item_{model_name_or_path.split("/")[-1]}_{diverse_no}.pkl',
+                      'wb') as f:
                 pickle.dump(item_emb, f)
