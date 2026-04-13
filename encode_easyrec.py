@@ -48,12 +48,12 @@ tokenizer = AutoTokenizer.from_pretrained(
 
 
 def load_original_profiles(dataset: str):
-    base_dir = Path(f'./data/{dataset}')
+    base_dir = Path(f'./data/{dataset}/llm_profiles')
 
-    with open(base_dir / 'user_profile.json', 'r', encoding='utf-8') as f:
+    with open(base_dir / 'user_profile_llm.json', 'r', encoding='utf-8') as f:
         user_profile = json.load(f)
 
-    with open(base_dir / 'item_profile.json', 'r', encoding='utf-8') as f:
+    with open(base_dir / 'item_profile_llm.json', 'r', encoding='utf-8') as f:
         item_profile = json.load(f)
 
     user_profile_list = [user_profile[str(i)] for i in range(len(user_profile))]
