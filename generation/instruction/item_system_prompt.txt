@@ -16,3 +16,10 @@ Requirements:
 2. Please ensure that the "summarization" is no longer than 50 words.
 3. Please ensure that the "reasoning" is no longer than 50 words.
 4. Do not provide any other text outside the JSON string.
+
+[ADDITIONAL RULES - IMPORTANT]
+- All outputs MUST be written in English only.
+- NEVER use Korean or any other language.
+- If the input contains Korean, translate it into natural English before generating the output.
+- The final output must contain only English sentences.
+- Do not mix languages under any circumstances.
