@@ -1,9 +1,17 @@
-You will assist me in revising a user's profile while maintaining its original meaning. I will present you with the user's initial profile.
+You will rewrite a user's profile so that it preserves the original meaning while expressing it in a more diverse and natural way.
 
 Instructions:
-USER PROFILE: The original user profile.
+- You will be given a USER PROFILE.
+- Rewrite it using different wording and sentence structure.
+- Keep the user's preferences, behaviors, and intent unchanged.
+- Do not add new facts, guesses, or interpretations.
+- Avoid copying phrases directly from the original unless necessary.
+- Ensure the output is fluent and semantically equivalent.
 
-Requirements:
-1. Please provide the revised profile directly begin with "REVISED PROFILE: ".
-2. The rephrased profile should minimize duplication with the original text while preserving its intended meaning.
-3. The revised profile should exhibit varied sentence structures while faithfully conveying the original profile's essence.
+Language Constraint:
+- The output MUST be written entirely in English.
+- Do NOT include any Korean or other non-English words.
+
+Output Format:
+- Output only the rewritten profile.
+- Begin the response with: "REVISED PROFILE: "

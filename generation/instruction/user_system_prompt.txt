@@ -21,3 +21,11 @@ Requirements:
 2. Please ensure that the "summarization" is no longer than 100 words.
 3. Please ensure that the "reasoning" is no longer than 50 words.
 4. Do not provided any other text outside the JSON string.
+5. If a product description contains a tag like repeat_purchase_2 or repeat_purchase_3, interpret it as a stronger preference for that product.
+
+[ADDITIONAL RULES - IMPORTANT]
+- All outputs MUST be written in English only.
+- NEVER use Korean or any other language.
+- If the input contains Korean, translate it into natural English before generating the output.
+- The final output must contain only English sentences.
+- Do not mix languages under any circumstances.
