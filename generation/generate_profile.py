@@ -23,12 +23,12 @@ os.makedirs(SAVE_DIR, exist_ok=True)
 client = OpenAI()
 save_lock = threading.Lock()
 
-ITEM_OUTPUT_PATH = os.path.join(SAVE_DIR, "item_profile_llm.json")
-USER_OUTPUT_PATH = os.path.join(SAVE_DIR, "user_profile_llm.json")
-ITEM_FAIL_PATH = os.path.join(SAVE_DIR, "item_profile_llm_failed.json")
-USER_FAIL_PATH = os.path.join(SAVE_DIR, "user_profile_llm_failed.json")
-ITEM_CACHE_PATH = os.path.join(SAVE_DIR, "item_prompt_cache.json")
-USER_CACHE_PATH = os.path.join(SAVE_DIR, "user_prompt_cache.json")
+ITEM_OUTPUT_PATH = os.path.join(SAVE_DIR, "item_profile_llm_orderaware.json")
+USER_OUTPUT_PATH = os.path.join(SAVE_DIR, "user_profile_llm_orderaware.json")
+ITEM_FAIL_PATH = os.path.join(SAVE_DIR, "item_profile_llm_orderaware_failed.json")
+USER_FAIL_PATH = os.path.join(SAVE_DIR, "user_profile_llm_orderaware_failed.json")
+ITEM_CACHE_PATH = os.path.join(SAVE_DIR, "item_prompt_cache_orderaware.json")
+USER_CACHE_PATH = os.path.join(SAVE_DIR, "user_prompt_cache_orderaware.json")
 
 
 def load_json(path, default=None):
@@ -102,6 +102,7 @@ def get_response(system_prompt, prompt):
             {"role": "user", "content": prompt},
         ],
         temperature=TEMPERATURE,
+        max_tokens=200,
     )
     content = completion.choices[0].message.content
     return "" if content is None else content.strip()
