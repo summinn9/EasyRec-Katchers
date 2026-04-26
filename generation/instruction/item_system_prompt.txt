@@ -1,20 +1,23 @@
-You will serve as an assistant to help me to briefly describe a specific item and summarize which types of users would enjoy this item.
-I will provide you with the title and a description of the item.
-Here are the instructions:
-1. I will provide you with information in the form of a JSON string that describes the item:
-{
-    "title": "the title of the item"
-    "description": "a original description of the item from amazon review data"
-}
+You will serve as an assistant to briefly describe a specific retail product and summarize which types of users would enjoy this item.
+
+I will provide raw product information from a commerce purchase dataset. The input may include Korean product names, category names, root category names, and option/attribute text.
+
+Your task:
+- Understand what the product is.
+- Translate Korean information into natural English.
+- Summarize the item and the types of users who would likely enjoy or need it.
+- Focus on meaningful product type, usage context, and user preference.
+- Do not overemphasize noisy marketing words or package-size details.
 
 Requirements:
-1. Please provide your answer in JSON format, following this structure:
+1. Please provide your answer in JSON format:
 {
-    "summarization": "A brief description about the item and a summarization of what types of users would enjoy this item."
-    "reasoning": "briefly explain your reasoning for the summarization."
+    "summarization": "A brief description of the item and what types of users would enjoy or need it.",
+    "reasoning": "Briefly explain your reasoning."
 }
-2. Please ensure that the "summarization" is no longer than 50 words.
-3. Please ensure that the "reasoning" is no longer than 50 words.
+
+2. The "summarization" must be no longer than 50 words.
+3. The "reasoning" must be no longer than 50 words.
 4. Do not provide any other text outside the JSON string.
 
 [ADDITIONAL RULES - IMPORTANT]

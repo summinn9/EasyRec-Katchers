@@ -107,19 +107,21 @@ df = pd.read_csv(DATA_PATH, sep="\t")
 
 df = df[[
     "user_id",
+    "order_id",
+    "order_code",
     "product_id",
     "product_name",
     "category_name",
     "root_category_name",
     "attributes",
-    "initial_paid_at"
+    "initial_paid_at",
+    "day"
 ]].copy()
 
 df = df.dropna(subset=["user_id", "product_id"])
-df = df.drop_duplicates(subset=["user_id", "product_id", "initial_paid_at"])
+df = df.drop_duplicates(subset=["user_id", "product_id", "order_id", "initial_paid_at"])
 
-df["initial_paid_at"] = pd.to_datetime(df["initial_paid_at"], errors="coerce")
-
+df["initial_paid_at"] = pd.to_datetime(df["initial_paid_at"], unit="ms", errors="coerce")
 print("데이터 크기:", df.shape)
 
 # ===== 2. ID 매핑 =====
@@ -187,46 +189,76 @@ with open(os.path.join(SAVE_PATH, "item_profile.json"), "w", encoding="utf-8") a
 
 print("item profile 저장 완료")
 
-# ===== 6. user profile =====
+# ===== 6. user profile: order-aware version =====
+from collections import OrderedDict, defaultdict
+
 user_profiles = {}
 
-train_user_group = train_df.sort_values("initial_paid_at", ascending=False).groupby("uid")
+train_user_group = (
+    train_df.sort_values("initial_paid_at", ascending=False)
+            .groupby("uid")
+)
 
 for uid, group in train_user_group:
-    item_map = OrderedDict()
+    product_count = defaultdict(int)
+    profile_parts = []
 
-    for _, row in group.iterrows():
-        pid = row["product_id"]
-        text = get_item_text_with_fallback(row)
+    # 최근 주문 순서 유지
+    order_group = (
+        group.sort_values("initial_paid_at", ascending=False)
+             .groupby("order_id", sort=False)
+    )
 
-        if not text:
+    for order_id, order_rows in order_group:
+        order_item_map = OrderedDict()
+
+        for _, row in order_rows.iterrows():
+            pid = row["product_id"]
+            text = get_item_text_with_fallback(row)
+
+            if not text:
+                continue
+
+            product_count[pid] += 1
+
+            # 같은 주문 안에서 같은 상품 중복 방지
+            if pid not in order_item_map:
+                order_item_map[pid] = text
+
+        if not order_item_map:
             continue
 
-        # 같은 상품 재구매면 횟수 누적
-        if pid in item_map:
-            item_map[pid]["count"] += 1
+        order_item_texts = list(order_item_map.values())
+
+        MAX_ITEMS_PER_ORDER = 5
+        order_item_texts = order_item_texts[:MAX_ITEMS_PER_ORDER]
+
+        # 같은 주문에서 2개 이상 구매한 경우 = 동시구매 정보 반영
+        if len(order_item_texts) >= 2:
+            part = "Recent order with items bought together: " + " | ".join(order_item_texts)
         else:
-            item_map[pid] = {
-                "text": text,
-                "count": 1
-            }
+            part = "Recent single purchase item: " + order_item_texts[0]
 
-    item_texts = []
+        profile_parts.append(part)
 
-    # 최근 순서 유지하면서 최대 20개
-    for pid, info in item_map.items():
-        text = info["text"]
-        count = info["count"]
-
-        if count >= 2:
-            text = f"{text} repeat_purchase_{count}"
-        item_texts.append(text)
-
-        if len(item_texts) >= 20:
+        # 너무 길어지는 것 방지: 최근 주문 기준 최대 20개
+        if len(profile_parts) >= 20:
             break
 
-    if item_texts:
-        user_profiles[str(uid)] = " ; ".join(item_texts)
+    # 반복구매 정보 추가
+    repeat_parts = []
+    for pid, count in product_count.items():
+        if count >= 2:
+            item_text = item_profiles[str(item2id[pid])]
+            repeat_parts.append(f"Repeated purchase item: {item_text} repeat_purchase_{count}")
+
+    final_parts = profile_parts + repeat_parts[:5]
+
+    MAX_REPEAT_ITEMS = 5
+    final_parts = profile_parts + repeat_parts[:MAX_REPEAT_ITEMS]
+
+    if final_parts:
+        user_profiles[str(uid)] = " ; ".join(final_parts)
     else:
         user_profiles[str(uid)] = "no purchase profile"
 
@@ -236,7 +268,7 @@ for uid in range(num_users):
 with open(os.path.join(SAVE_PATH, "user_profile.json"), "w", encoding="utf-8") as f:
     json.dump(user_profiles, f, ensure_ascii=False, indent=2)
 
-print("user profile 저장 완료")
+print("order-aware user profile 저장 완료")
 
 # ===== 7. 통계 확인 =====
 empty_item_count = sum(1 for v in item_profiles.values() if not str(v).strip())

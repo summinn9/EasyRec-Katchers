@@ -8,3 +8,8 @@ data/katchers/llm_profiles/item_prompt_cache.json
 data/katchers/llm_profiles/item_profile_llm_failed.json
 data/katchers/llm_profiles/user_profile_llm_failed.json
 data/katchers/llm_profiles/user_prompt_cache.json
+
+data/katchers/llm_profiles/item_prompt_cache_orderaware.json
+data/katchers/llm_profiles/item_profile_llm_orderaware_failed.json
+data/katchers/llm_profiles/user_profile_llm_orderaware_failed.json
+data/katchers/llm_profiles/user_prompt_cache_orderaware.json
