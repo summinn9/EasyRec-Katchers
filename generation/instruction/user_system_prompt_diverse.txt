@@ -1,16 +1,27 @@
-You will rewrite a user's profile so that it preserves the original meaning while expressing it in a more diverse and natural way.
+You will rewrite a user's profile to create a slightly more diverse and natural variation.
 
 Instructions:
-- You will be given a USER PROFILE.
-- Rewrite it using different wording and sentence structure.
-- Keep the user's preferences, behaviors, and intent unchanged.
-- Do not add new facts, guesses, or interpretations.
-- Avoid copying phrases directly from the original unless necessary.
-- Ensure the output is fluent and semantically equivalent.
+- You will be given a USER PROFILE that describes the user's purchase behavior, preferences, and patterns.
+- Rewrite the profile using different wording and sentence structure.
+- You may slightly shift the focus by emphasizing different aspects such as:
+  - purchase habits
+  - frequently bought item types
+  - co-purchase patterns (items bought together)
+  - repeated purchases (strong preferences)
+
+Constraints:
+- The rewritten profile MUST remain fully consistent with the original profile.
+- All inferred preferences must be directly supported by the given data.
+- Do NOT introduce any new facts, assumptions, or interpretations that are not clearly supported.
+- Do NOT exaggerate or generalize beyond the original behavior.
+- Avoid simply copying the original sentence structure, but do NOT change the meaning.
+
+Goal:
+- The rewritten profile should reflect the same user with slightly varied expression and focus, not a completely different interpretation.
 
 Language Constraint:
 - The output MUST be written entirely in English.
-- Do NOT include any Korean or other non-English words.
+- Do NOT include Korean or any other language.
 
 Output Format:
 - Output only the rewritten profile.

@@ -1,16 +1,23 @@
-You will rewrite an item's profile so that it preserves the original meaning while expressing it in a more diverse and natural way.
+You will rewrite an item's profile to create a slightly more natural and diverse variation.
 
 Instructions:
-- You will be given an ITEM PROFILE.
+- You will be given an ITEM PROFILE describing a product.
 - Rewrite it using different wording and sentence structure.
-- Keep the item's key attributes, category meaning, and overall description unchanged.
-- Do not add new facts, guesses, or interpretations.
-- Avoid copying phrases directly from the original unless necessary.
-- Ensure the output is fluent and semantically equivalent.
+- Preserve the product’s core meaning, attributes, category, and usage.
+
+Constraints:
+- The rewritten profile MUST remain fully consistent with the original.
+- Do NOT introduce any new facts, assumptions, or interpretations.
+- Do NOT exaggerate or generalize beyond the original description.
+- Do NOT change the product type or usage.
+- Avoid copying phrases directly, but keep the meaning exactly the same.
+
+Goal:
+- The rewritten version should improve fluency and variation in wording, while maintaining identical meaning.
 
 Language Constraint:
 - The output MUST be written entirely in English.
-- Do NOT include any Korean or other non-English words.
+- Do NOT include Korean or any other language.
 
 Output Format:
 - Output only the rewritten profile.
