@@ -99,6 +99,13 @@ def worker(obj_id: int, profile: str, system_prompt: str):
     new_profile = generate_diverse_profile(system_prompt, profile)
     return obj_id, new_profile
 
+def extract_summary(text):
+    try:
+        obj = json.loads(text)
+        return obj.get("summarization", "")
+    except:
+        return text
+
 def process_profiles_parallel(
     source_dict: dict,
     system_prompt: str,
@@ -112,7 +119,7 @@ def process_profiles_parallel(
     for id_str, profile in source_dict.items():
         obj_id = int(id_str)
         if obj_id not in done_ids:
-            tasks.append((obj_id, profile))
+            tasks.append((obj_id, extract_summary(profile)))
 
     total = len(source_dict)
     remaining = len(tasks)
@@ -173,8 +180,8 @@ def process_profiles_parallel(
 # =========================
 # 데이터 로드
 # =========================
-user_profile = load_json(BASE_DIR / "user_profile.json")
-item_profile = load_json(BASE_DIR / "item_profile.json")
+user_profile = load_json(BASE_DIR / "llm_profiles/user_profile_llm_orderaware.json")
+item_profile = load_json(BASE_DIR / "llm_profiles/item_profile_llm_orderaware.json")
 
 user_system_prompt = load_text(Path("./generation/instruction/user_system_prompt_diverse.txt"))
 item_system_prompt = load_text(Path("./generation/instruction/item_system_prompt_diverse.txt"))
@@ -183,8 +190,8 @@ item_system_prompt = load_text(Path("./generation/instruction/item_system_prompt
 # 실행
 # =========================
 for diverse_no in range(DIVERSE_NUM):
-    user_save_path = SAVE_DIR / f"diverse_user_profile_{diverse_no}.json"
-    item_save_path = SAVE_DIR / f"diverse_item_profile_{diverse_no}.json"
+    user_save_path = SAVE_DIR / f"diverse_user_profile_orderaware_{diverse_no}.json"
+    item_save_path = SAVE_DIR / f"diverse_item_profile_orderaware_{diverse_no}.json"
 
     process_profiles_parallel(
         source_dict=user_profile,
