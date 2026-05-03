@@ -64,11 +64,11 @@ class LazyPretrainEmbedderDataset(Dataset):
             
             # diverse description of users/items
             for i in range(used_diverse_profile_num):
-                with open(f'{self.data_path}/{_dataset}/diverse_profile/diverse_user_profile_{i}.json', 'r') as f:
+                with open(f'{self.data_path}/{_dataset}/diverse_profile/diverse_user_profile_orderaware_{i}.json', 'r') as f:
                     for _line in f.readlines():
                         _profile = json.loads(_line)
                         self.user_profile[_dataset][_profile['user_id']].append(_profile['profile'])
-                with open(f'{self.data_path}/{_dataset}/diverse_profile/diverse_item_profile_{i}.json', 'r') as f:
+                with open(f'{self.data_path}/{_dataset}/diverse_profile/diverse_item_profile_orderaware_{i}.json', 'r') as f:
                     for _line in f.readlines():
                         _profile = json.loads(_line)
                         self.item_profile[_dataset][_profile['item_id']].append(_profile['profile'])
@@ -191,11 +191,11 @@ class PretrainEmbedderAllRankTestDataset(Dataset):
                     _profile = json.loads(_line)
                     self.item_profile[_profile['item_id']] = _profile['profile']
         else:
-            with open(f'{self.data_path}/{self.dataset_name}/diverse_profile/diverse_user_profile_{diverse_profile_no}.json', 'r') as f:
+            with open(f'{self.data_path}/{self.dataset_name}/diverse_profile/diverse_user_profile_orderaware_{diverse_profile_no}.json', 'r') as f:
                 for _line in f.readlines():
                     _profile = json.loads(_line)
                     self.user_profile[_profile['user_id']] = _profile['profile']
-            with open(f'{self.data_path}/{self.dataset_name}/diverse_profile/diverse_item_profile_{diverse_profile_no}.json', 'r') as f:
+            with open(f'{self.data_path}/{self.dataset_name}/diverse_profile/diverse_item_profile_orderaware_{diverse_profile_no}.json', 'r') as f:
                 for _line in f.readlines():
                     _profile = json.loads(_line)
                     self.item_profile[_profile['item_id']] = _profile['profile']
@@ -253,11 +253,11 @@ class EvalEmbedderAllRankTestDataset(Dataset):
                     _profile = json.loads(_line)
                     self.item_profile[_profile['item_id']] = _profile['profile']
         else:
-            with open(f'{self.data_path}/{self.dataset_name}/diverse_profile/diverse_user_profile_{diverse_profile_no}.json', 'r') as f:
+            with open(f'{self.data_path}/{self.dataset_name}/diverse_profile/diverse_user_profile_orderaware_{diverse_profile_no}.json', 'r') as f:
                 for _line in f.readlines():
                     _profile = json.loads(_line)
                     self.user_profile[_profile['user_id']] = _profile['profile']
-            with open(f'{self.data_path}/{self.dataset_name}/diverse_profile/diverse_item_profile_{diverse_profile_no}.json', 'r') as f:
+            with open(f'{self.data_path}/{self.dataset_name}/diverse_profile/diverse_item_profile_orderaware_{diverse_profile_no}.json', 'r') as f:
                 for _line in f.readlines():
                     _profile = json.loads(_line)
                     self.item_profile[_profile['item_id']] = _profile['profile']
