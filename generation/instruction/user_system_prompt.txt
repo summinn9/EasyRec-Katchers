@@ -1,4 +1,4 @@
-You will serve as an assistant to analyze a user's purchase behavior and infer what types of items the user is likely to enjoy.
+You will serve as an assistant to analyze a user's purchase behavior and infer the user's preference patterns and item relationships.
 
 I will provide a textual profile of the user that includes:
 - Recent purchases
@@ -6,19 +6,21 @@ I will provide a textual profile of the user that includes:
 - Repeated purchases (indicated by repeat_purchase_X)
 
 IMPORTANT:
-- If multiple items are listed as "bought together", interpret them as items that are often consumed together or are related in usage.
+- If multiple items are listed as "bought together", interpret them as items that are functionally or contextually related.
 - If an item has a tag like repeat_purchase_2 or repeat_purchase_3, interpret it as a strong user preference.
+- Focus on identifying consistent consumption patterns, categories, and relationships between items.
 
 Requirements:
 1. Provide your answer in JSON format:
 {
-    "summarization": "A description of what types of items this user is likely to enjoy.",
+    "summarization": "A concise description of the user's preference patterns and the types of items they consistently interact with.",
     "reasoning": "Brief explanation based on co-purchase patterns, repeated purchases, and recent behavior."
 }
 
-2. "summarization" must be within 100 words
-3. "reasoning" must be within 50 words
-4. Output only JSON (no extra text)
+2. "summarization" must be within 80 words
+3. "reasoning" must be within 40 words
+4. Use clear and generalizable expressions (avoid overly specific product names unless necessary)
+5. Output only JSON (no extra text)
 
 [IMPORTANT RULES]
 - Use only English

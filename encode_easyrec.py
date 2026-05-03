@@ -50,10 +50,10 @@ tokenizer = AutoTokenizer.from_pretrained(
 def load_original_profiles(dataset: str):
     base_dir = Path(f'./data/{dataset}/llm_profiles')
 
-    with open(base_dir / 'user_profile_llm.json', 'r', encoding='utf-8') as f:
+    with open(base_dir / 'user_profile_llm_orderaware.json', 'r', encoding='utf-8') as f:
         user_profile = json.load(f)
 
-    with open(base_dir / 'item_profile_llm.json', 'r', encoding='utf-8') as f:
+    with open(base_dir / 'item_profile_llm_orderaware.json', 'r', encoding='utf-8') as f:
         item_profile = json.load(f)
 
     user_profile_list = [user_profile[str(i)] for i in range(len(user_profile))]
@@ -68,8 +68,8 @@ def load_diverse_profiles(dataset: str, diverse_no: int):
     user_profile = {}
     item_profile = {}
 
-    user_path = base_dir / f'diverse_user_profile_{diverse_no}.json'
-    item_path = base_dir / f'diverse_item_profile_{diverse_no}.json'
+    user_path = base_dir / f'diverse_user_profile_orderaware_{diverse_no}.json'
+    item_path = base_dir / f'diverse_item_profile_orderaware_{diverse_no}.json'
 
     with open(user_path, 'r', encoding='utf-8') as f:
         for line in f:

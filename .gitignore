@@ -13,3 +13,9 @@ data/katchers/llm_profiles/item_prompt_cache_orderaware.json
 data/katchers/llm_profiles/item_profile_llm_orderaware_failed.json
 data/katchers/llm_profiles/user_profile_llm_orderaware_failed.json
 data/katchers/llm_profiles/user_prompt_cache_orderaware.json
+
+data/katchers/filtered_all.csv
+data/katchers/item2id.json
+data/katchers/user2id.json
+data/katchers/test_df.csv
+data/katchers/train_df.csv

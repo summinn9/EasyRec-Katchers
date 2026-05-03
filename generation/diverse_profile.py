@@ -21,12 +21,13 @@ DIVERSE_NUM = 1
 MAX_RETRY = 5
 MAX_WORKERS = 4
 REQUEST_TIMEOUT = 60
+MAX_OUTPUT_TOKENS = 256
 
 client = OpenAI()
 
-# 파일 쓰기 락
 write_lock = threading.Lock()
 print_lock = threading.Lock()
+
 
 # =========================
 # 유틸 함수
@@ -35,35 +36,68 @@ def load_json(path: Path):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
+
 def load_text(path: Path):
     with open(path, "r", encoding="utf-8") as f:
-        return f.read()
+        return f.read().strip()
+
 
 def read_existing_ids(path: Path, id_key: str):
     done_ids = set()
+
     if not path.exists():
         return done_ids
 
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
             line = line.strip()
+
             if not line:
                 continue
+
             try:
                 obj = json.loads(line)
                 done_ids.add(int(obj[id_key]))
             except Exception:
                 continue
+
     return done_ids
 
+
 def extract_response_text(text: str) -> str:
-    """
-    'REVISED PROFILE: ' 접두어가 있으면 제거
-    """
     prefix = "REVISED PROFILE:"
+    text = text.strip()
+
     if text.startswith(prefix):
         return text[len(prefix):].strip()
-    return text.strip()
+
+    return text
+
+
+def extract_profile_text(text):
+    """
+    LLM profile이 JSON 문자열이면 summarization + reasoning을 같이 사용.
+    그냥 문자열이면 그대로 사용.
+    """
+    if text is None:
+        return ""
+
+    text = str(text).strip()
+
+    if not text:
+        return ""
+
+    try:
+        obj = json.loads(text)
+        summarization = obj.get("summarization", "")
+        reasoning = obj.get("reasoning", "")
+
+        merged = f"{summarization} {reasoning}".strip()
+        return merged if merged else text
+
+    except Exception:
+        return text
+
 
 def generate_diverse_profile(system_prompt: str, original_profile: str) -> str:
     last_error = None
@@ -74,11 +108,13 @@ def generate_diverse_profile(system_prompt: str, original_profile: str) -> str:
                 model=MODEL_NAME,
                 instructions=system_prompt,
                 input=original_profile,
-                max_output_tokens=512,
+                max_output_tokens=MAX_OUTPUT_TOKENS,
                 timeout=REQUEST_TIMEOUT,
+                temperature=0.3,
             )
 
             text = response.output_text.strip()
+
             if not text:
                 raise ValueError("빈 응답이 반환되었습니다.")
 
@@ -95,16 +131,11 @@ def generate_diverse_profile(system_prompt: str, original_profile: str) -> str:
 
     raise RuntimeError(f"생성 실패: {last_error}")
 
+
 def worker(obj_id: int, profile: str, system_prompt: str):
     new_profile = generate_diverse_profile(system_prompt, profile)
     return obj_id, new_profile
 
-def extract_summary(text):
-    try:
-        obj = json.loads(text)
-        return obj.get("summarization", "")
-    except:
-        return text
 
 def process_profiles_parallel(
     source_dict: dict,
@@ -116,10 +147,22 @@ def process_profiles_parallel(
     done_ids = read_existing_ids(save_path, id_key)
 
     tasks = []
+
     for id_str, profile in source_dict.items():
         obj_id = int(id_str)
-        if obj_id not in done_ids:
-            tasks.append((obj_id, extract_summary(profile)))
+
+        if obj_id in done_ids:
+            continue
+
+        profile_text = extract_profile_text(profile)
+
+        if not profile_text:
+            continue
+
+        if profile_text == "No purchase history available.":
+            continue
+
+        tasks.append((obj_id, profile_text))
 
     total = len(source_dict)
     remaining = len(tasks)
@@ -177,6 +220,7 @@ def process_profiles_parallel(
         f"이미 저장됨={skipped}, 전체={total}"
     )
 
+
 # =========================
 # 데이터 로드
 # =========================
@@ -185,6 +229,10 @@ item_profile = load_json(BASE_DIR / "llm_profiles/item_profile_llm_orderaware.js
 
 user_system_prompt = load_text(Path("./generation/instruction/user_system_prompt_diverse.txt"))
 item_system_prompt = load_text(Path("./generation/instruction/item_system_prompt_diverse.txt"))
+
+print("user profile 수:", len(user_profile))
+print("item profile 수:", len(item_profile))
+
 
 # =========================
 # 실행
